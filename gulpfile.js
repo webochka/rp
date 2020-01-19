@@ -14,6 +14,8 @@ const gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     fileinclude = require('gulp-file-include'),
     styleInject = require("gulp-style-inject");
+    inlinesource = require("gulp-inline-source");
+    babel = require('gulp-babel');
     browserSync = require('browser-sync').create();
 
 gulp.task('server', function() {
@@ -57,20 +59,20 @@ gulp.task('minify:css', function() {
         .pipe(gulp.dest('./pages/'));
 });
 
-gulp.task('minify:js', function() {
-    gulp.src('./pages/**/**/*.js')
-        .pipe(uglify())
-        .pipe(gulp.dest('./public/'));
-});
+ gulp.task('babel', function() {
+     gulp.src('./pages/**/**/*.js')
+         .pipe(babel())
+         .pipe(gulp.dest('./pages/**/**/*.js'));
+ });
 
 gulp.task('clean', function() {
     return gulp.src('./public', { read: false }).pipe(clean());
 });
 
 gulp.task('watch', ['server', 'sass']);
-gulp.task('production', ['minify:css', 'minify:js', 'minify:img'], function () {  
+gulp.task('production', ['minify:css', 'babel' ,'minify:img'], function () {  
     return gulp.src(['./pages/**/**/*.html'])
-        .pipe(styleInject())
+        .pipe(inlinesource())
         .pipe(minifyHTML())
         .pipe(gulp.dest('./public/'));
 });
